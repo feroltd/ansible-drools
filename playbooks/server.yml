@@ -1,0 +1,18 @@
+---
+- name: Deploy Execution Server
+  hosts: servers
+  vars:
+    drools_version: 6.4.0.Final
+    drools_server_url: http://download.jboss.org/drools/release/{{ drools_version }}/kie-server-distribution-{{ drools_version }}.zip
+  tasks: 
+    - name: install apt packages
+      apt: pkg={{ item }}
+      become: True
+      with_items:
+        - openjdk-7-jdk
+        - tomcat7
+        - unzip
+    - name: download distribution zip file
+      get_url: url={{ drools_server_url }} dest=/home/vagrant/kie-server.zip 
+    - name: unzip distribution zip file 
+      unarchive: src=/home/vagrant/kie-server.zip dest=/home/vagrant/ copy=no

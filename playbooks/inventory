@@ -1,0 +1,8 @@
+workbench ansible_ssh_host=192.168.0.172 ansible_become_pass=vagrant
+server0 ansible_ssh_host=192.168.0.173 ansible_become_pass=vagrant
+
+[workbench]
+workbench
+
+[servers]
+server0

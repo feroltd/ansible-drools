@@ -1,0 +1,35 @@
+- name: Deploy Workbench
+  hosts: workbench
+  vars:
+    drools_version: 6.4.0.Final
+    drools_wb_url: http://download.jboss.org/drools/release/{{ drools_version }}/kie-drools-wb-distribution-wars-{{ drools_version }}-tomcat7.war
+    tomcat_home: /var/lib/tomcat7
+    files_base_path: files/workbench
+  tasks:
+    - name: install apt packages
+      apt: pkg={{ item }}
+      become: True
+      with_items:
+        - openjdk-7-jdk
+        - tomcat7
+    - name: download workbench war
+      get_url: url={{ drools_wb_url }} dest={{ tomcat_home }}/webapps/kie-wb.war 
+      become: True
+    - name: copy libs into tomcat lib
+      copy: src={{ files_base_path}}/libs/ dest={{ tomcat_home }}/lib
+      become: True
+    - name: create configuration files inside tomcat conf
+      copy: src={{ files_base_path }}/conf/ dest={{ tomcat_home }}/conf
+      become: True
+    - name: define system properties for btm.root, bitronix config file, JBoss logging provider and others
+      copy: src={{ files_base_path }}/bin/ dest={{ tomcat_home }}/bin
+      become: True
+    - name: configure JEE security part one
+      copy: src={{ files_base_path }}/security_libs/ dest={{ tomcat_home }}/lib
+      become: True
+    - name: configure JEE security part two
+      copy: src={{ files_base_path }}/security_conf/ dest={{ tomcat_home }}/conf
+      become: True
+    - name: restart server
+      service: name=tomcat7 state=restarted
+      become: True
